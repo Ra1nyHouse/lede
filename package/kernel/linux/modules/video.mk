@@ -501,7 +501,7 @@ $(eval $(call KernelPackage,drm-amdgpu))
 define KernelPackage/drm-gpuvm
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=DRM GPU-VM support
-  DEPENDS:=@(TARGET_x86_64||TARGET_x86_generic||TARGET_x86_legacy) +kmod-drm-exec
+  DEPENDS:=+kmod-drm-exec
   KCONFIG:=CONFIG_DRM_GPUVM
   FILES:=$(LINUX_DIR)/drivers/gpu/drm/drm_gpuvm.ko
   AUTOLOAD:=$(call AutoProbe,drm_gpuvm)
@@ -686,7 +686,7 @@ $(eval $(call KernelPackage,drm-panfrost))
 define KernelPackage/drm-panthor
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=DRM support for ARM Mali Valhall GPUs (panthor)
-  DEPENDS:=@(TARGET_rockchip||TARGET_sunxi) +kmod-drm-sched +kmod-drm-shmem-helper
+  DEPENDS:=@(TARGET_rockchip||TARGET_sunxi) +kmod-drm-sched +kmod-drm-shmem-helper +kmod-drm-exec +kmod-drm-gpuvm
   KCONFIG:=CONFIG_DRM_PANTHOR
   FILES:=$(LINUX_DIR)/drivers/gpu/drm/panthor/panthor.ko
   AUTOLOAD:=$(call AutoProbe,panthor)

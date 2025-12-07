@@ -3,9 +3,9 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=rockchip-mpp
 PKG_RELEASE:=1
 
-PKG_BUILD_DIR:=$(KERNEL_BUILD_DIR)/$(PKG_NAME)
-
 include $(INCLUDE_DIR)/kernel.mk
+
+PKG_BUILD_DIR:=$(KERNEL_BUILD_DIR)/$(PKG_NAME)
 include $(INCLUDE_DIR)/package.mk
 
 define KernelPackage/rockchip-mpp

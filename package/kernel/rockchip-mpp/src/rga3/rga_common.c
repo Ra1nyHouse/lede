@@ -5,8 +5,8 @@
  * Author: Cerf Yu <cerf.yu@rock-chips.com>
  */
 
-#include "rga.h"
-#include "rga_common.h"
+#include <rga.h>
+#include <rga_common.h>
 
 bool rga_is_rgb_format(uint32_t format)
 {

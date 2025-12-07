@@ -5,12 +5,12 @@
  * Author: Huang Lee <Putin.li@rock-chips.com>
  */
 
-#include "rga3_reg_info.h"
-#include "rga_dma_buf.h"
-#include "rga_iommu.h"
-#include "rga_common.h"
-#include "rga_debugger.h"
-#include "rga_hw_config.h"
+#include <rga3_reg_info.h>
+#include <rga_dma_buf.h>
+#include <rga_iommu.h>
+#include <rga_common.h>
+#include <rga_debugger.h>
+#include <rga_hw_config.h>
 
 #define FACTOR_MAX ((int)(2 << 15))
 

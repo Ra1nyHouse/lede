@@ -5,12 +5,12 @@
  * Author: Huang Lee <Putin.li@rock-chips.com>
  */
 
-#include "rga_iommu.h"
-#include "rga_dma_buf.h"
-#include "rga_mm.h"
-#include "rga_job.h"
-#include "rga_common.h"
-#include "rga_hw_config.h"
+#include <rga_iommu.h>
+#include <rga_dma_buf.h>
+#include <rga_mm.h>
+#include <rga_job.h>
+#include <rga_common.h>
+#include <rga_hw_config.h>
 
 int rga_user_memory_check(struct page **pages, u32 w, u32 h, u32 format, int flag)
 {

@@ -9,9 +9,9 @@
 #include <linux/sync_file.h>
 #include <linux/slab.h>
 
-#include "rga_drv.h"
-#include "rga_fence.h"
-#include "rga_common.h"
+#include <rga_drv.h>
+#include <rga_fence.h>
+#include <rga_common.h>
 
 static const char *rga_fence_get_name(struct dma_fence *fence)
 {

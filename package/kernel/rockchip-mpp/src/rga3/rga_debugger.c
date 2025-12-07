@@ -16,12 +16,12 @@
 #include <linux/seq_file.h>
 #include <linux/vmalloc.h>
 
-#include "rga.h"
-#include "rga_debugger.h"
-#include "rga_drv.h"
-#include "rga_mm.h"
-#include "rga_common.h"
-#include "rga_job.h"
+#include <rga.h>
+#include <rga_debugger.h>
+#include <rga_drv.h>
+#include <rga_mm.h>
+#include <rga_common.h>
+#include <rga_job.h>
 
 #define RGA_DEBUGGER_ROOT_NAME "rkrga"
 

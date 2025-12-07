@@ -1,8 +1,10 @@
 # Rockchip NPU / MPP 驱动开启指引
 
 本仓库已经移植了 Rockchip NPU (`package/kernel/rknpu`)、Mali GPU (`kmod-panthor`) 以及 MPP 相关内核驱动
-（`kmod-rockchip-mpp`, `kmod-rockchip-rga`, `kmod-rockchip-rga2`, `kmod-rockchip-rga3`, `kmod-rockchip-fec`, `kmod-rockchip-avsp`）。
+（`kmod-rockchip-mpp`, `kmod-rockchip-rga3`, `kmod-rockchip-fec`, `kmod-rockchip-avsp`）。
 MPP 框架现在包含完整的编解码器支持，包括视频编解码器、图像处理器等。
+
+**重要说明**：RGA (Rockchip Graphics Accelerator) 是独立的 2D 图形加速器，与 MPP 框架分离。RGA 用于图形处理（如缩放、旋转、格式转换），而 MPP 专注于视频编解码。两者可以协同工作，但 RGA 不是 MPP 的一部分。
 下面说明如何在编译配置中开启并验证这些模块。
 
 ## 支持的编解码器
@@ -21,9 +23,6 @@ MPP 框架现在包含完整的编解码器支持，包括视频编解码器、�
 ### 图像处理器
 - **IEP2**: 图像增强处理器 v2
 - **VDPP**: 视频数据后处理
-- **RGA**: Rockchip 2D 图形加速器 (传统)
-- **RGA2**: Rockchip 2D 图形加速器 v2 (RK356x/RK3588)
-- **RGA3**: Rockchip 2D 图形加速器 v3 (RK3588，多核)
 
 ### 编解码器
 - **JPGDEC**: JPEG 解码器
@@ -49,8 +48,6 @@ MPP 框架现在包含完整的编解码器支持，包括视频编解码器、�
 3) 在 `Kernel modules -> Rockchip` 中勾选需要的驱动（如未出现，先保存退出再进一次 menuconfig 或执行 `make package/kernel/rockchip-mpp/clean` 后重进）：
    - `kmod-rknpu`：Rockchip NPU（DRM GEM 路径）。
    - `kmod-rockchip-mpp`：Rockchip MPP service 框架（包含所有编解码器）。
-   - `kmod-rockchip-rga`：RGA 2D 加速（传统）。
-   - `kmod-rockchip-rga2`：RGA2 2D 加速（RK356x/RK3588）。
    - `kmod-rockchip-rga3`：RGA3 2D 加速（RK3588，多核）。
    - `kmod-rockchip-fec`：Fisheye Correction。
    - `kmod-rockchip-avsp`：Stitching 处理。
@@ -125,9 +122,40 @@ MPP 框架现在包含完整的编解码器支持，包括视频编解码器、�
   ls /dev/dri/
   ```
 
+## MPP 与 RGA 的关系
+
+**MPP (Media Process Platform)** 和 **RGA (Rockchip Graphics Accelerator)** 是两个独立但可以协同工作的子系统：
+
+### MPP 框架
+- **功能**：视频编解码、图像处理
+- **组件**：
+  - 视频编解码器（H.264/H.265/AV1/JPEG）
+  - 图像增强处理器（IEP2）
+  - 视频后处理（VDPP）
+  - 鱼眼矫正（FEC）
+  - 图像拼接（AVSP）
+
+### RGA 图形加速器
+- **功能**：2D 图形处理、图像格式转换
+- **特性**：
+  - 图像缩放、旋转、镜像
+  - 像素格式转换
+  - 颜色空间转换
+  - 混合和合成操作
+
+### 协同工作方式
+1. **视频播放流程**：MPP 解码视频 → RGA 进行图像后处理（缩放、格式转换）→ 显示
+2. **图像处理流程**：RGA 处理图像 → MPP 进行视频编码
+3. **独立使用**：两者都可以独立工作，不强制依赖
+
+### 选择建议
+- **RK3588 平台**：推荐使用 RGA3（多核，支持更高性能）
+- **需要视频编解码**：选择 MPP 相关组件
+- **需要图形加速**：选择 RGA3 组件
+- **两者都需要**：可以同时启用
+
 ## 备注
 - NPU 默认启用 DRM GEM 路径，DMA-HEAP 相关配置暂未开放。
-- RK3588 平台（如 Orange Pi 5 Plus）推荐使用 RGA2/RGA3 驱动以获得最佳性能。
 - Mali GPU (Panthor) 驱动需要对应的固件包，固件文件会自动安装到 `/lib/firmware/arm/mali/arch10.8/`。
 - 这些模块依赖 Rockchip 设备树中对应节点已启用；如使用自定义板级 DTS，请确认相关
   NPU/多媒体/GPU 节点未被禁用。

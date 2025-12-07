@@ -4,6 +4,7 @@ name: Build OpenWrt for Orange Pi 5 Plus
 # Using OpenWrt SDK Docker container with caching support
 # Triggered on pushes and pull requests to master branch
 # Uses orange-pi-5-plus.config from repo root for consistent builds
+# Includes full MPP/NPU/VPU support for multimedia acceleration
 
 on:
   push:

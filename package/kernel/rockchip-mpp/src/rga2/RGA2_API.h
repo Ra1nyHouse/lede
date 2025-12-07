@@ -3,7 +3,9 @@
 #define __RGA_API_H__
 
 #include <linux/miscdevice.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0))
 #include <linux/wakelock.h>
+#endif
 
 #include "rga2_reg_info.h"
 #include "rga2_debugger.h"

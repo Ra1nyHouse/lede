@@ -30,7 +30,9 @@
 #include <asm/cacheflush.h>
 #include <linux/slab.h>
 #include <linux/fb.h>
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 14, 0))
 #include <linux/wakelock.h>
+#endif
 #include <linux/version.h>
 
 #include "rga_reg_info.h"

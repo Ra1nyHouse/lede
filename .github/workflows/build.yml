@@ -8,6 +8,7 @@ on:
   push:
     branches: [ master ]
     paths:
+      - 'orange-pi-5-plus.config'
       - '.config'
       - 'package/**'
       - 'target/**'
@@ -16,6 +17,7 @@ on:
   pull_request:
     branches: [ master ]
     paths:
+      - 'orange-pi-5-plus.config'
       - '.config'
       - 'package/**'
       - 'target/**'
@@ -79,13 +81,24 @@ jobs:
         # Validate config file
         if [ ! -f orange-pi-5-plus.config ]; then
           echo "ERROR: orange-pi-5-plus.config file not found!"
+          echo "This file should be present in the repository."
+          echo "Please ensure the file is committed and pushed to the repository."
+          echo ""
+          echo "To recreate it from current .config:"
+          echo "  cp .config orange-pi-5-plus.config"
+          echo "  git add orange-pi-5-plus.config"
+          echo "  git commit -m 'Add Orange Pi 5 Plus config'"
+          echo "  git push"
           exit 1
         fi
 
         echo "=== Config Validation ==="
-        grep -E "CONFIG_TARGET.*orangepi.*5.*plus" orange-pi-5-plus.config || {
+        if grep -q "CONFIG_TARGET.*orangepi.*5.*plus" orange-pi-5-plus.config; then
+          echo "✓ Orange Pi 5 Plus configuration found"
+        else
           echo "WARNING: Orange Pi 5 Plus config not found in config file"
-        }
+          echo "The config file may not be for Orange Pi 5 Plus"
+        fi
 
         # Copy config to .config for build system
         cp orange-pi-5-plus.config .config

@@ -825,7 +825,13 @@ static inline int mpp_pmu_idle_request(struct mpp_dev *mpp, bool idle)
 	if (mpp->skip_idle)
 		return 0;
 
-	return rockchip_pmu_idle_request(mpp->dev, idle);
+	/* In newer kernels, rockchip_pmu_idle_request may not be available */
+	/* Use generic device power management instead */
+	if (idle) {
+		return pm_runtime_put_sync_suspend(mpp->dev);
+	} else {
+		return pm_runtime_get_sync(mpp->dev);
+	}
 }
 
 static inline struct mpp_dev *

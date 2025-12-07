@@ -1,6 +1,7 @@
-name: Build OpenWrt
+name: Build OpenWrt for Orange Pi 5 Plus
 
-# This workflow builds OpenWrt firmware for Rockchip targets with caching support
+# This workflow builds OpenWrt firmware specifically for Xunlong Orange Pi 5 Plus
+# Using OpenWrt SDK Docker container with caching support
 # Triggered on pushes and pull requests to master branch
 
 on:
@@ -11,6 +12,7 @@ on:
       - 'package/**'
       - 'target/**'
       - 'config/**'
+      - '.github/workflows/build.yml'
   pull_request:
     branches: [ master ]
     paths:
@@ -18,21 +20,14 @@ on:
       - 'package/**'
       - 'target/**'
       - 'config/**'
+      - '.github/workflows/build.yml'
 
 env:
   FORCE_UNSAFE_CONFIGURE: 1
-  DEBIAN_FRONTEND: noninteractive
-  CCACHE_DIR: /tmp/ccache
-  CCACHE_MAXSIZE: 2G
 
 jobs:
   build:
     runs-on: ubuntu-22.04
-
-    strategy:
-      fail-fast: false
-      matrix:
-        target: [rockchip-armv8]
 
     steps:
     - name: Checkout
@@ -49,121 +44,145 @@ jobs:
         remove-android: 'true'
         remove-haskell: 'true'
 
-    - name: Install dependencies
-      run: |
-        sudo apt update
-        sudo apt install -y build-essential clang flex bison g++ gawk \
-          gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev \
-          python3-distutils rsync unzip zlib1g-dev file wget qemu-utils \
-          libncursesw5-dev device-tree-compiler ccache
-
-    - name: Setup build environment
-      run: |
-        # Set git config for reproducible builds
-        git config --global user.email "ci@openwrt.org"
-        git config --global user.name "OpenWrt CI"
-
-        # Clean up any existing build artifacts that might cause issues
-        rm -rf tmp/ build_dir/target-*/.built* 2>/dev/null || true
-
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
-        key: ${{ runner.os }}-ccache-${{ matrix.target }}-${{ hashFiles('.config') }}
+        key: orangepi-5-plus-${{ hashFiles('.config') }}
         restore-keys: |
-          ${{ runner.os }}-ccache-${{ matrix.target }}-
-          ${{ runner.os }}-ccache-
+          orangepi-5-plus-
         max-size: 2G
 
     - name: Cache dl files
       uses: actions/cache@v4
       with:
         path: dl
-        key: ${{ runner.os }}-dl-${{ hashFiles('**/feeds.conf.default', '**/feeds.conf') }}
+        key: dl-cache-${{ hashFiles('**/feeds.conf.default') }}
         restore-keys: |
-          ${{ runner.os }}-dl-
+          dl-cache-
 
     - name: Cache staging_dir
       uses: actions/cache@v4
       with:
         path: staging_dir
-        key: ${{ runner.os }}-staging-${{ matrix.target }}-${{ hashFiles('.config', '**/feeds.conf.default') }}
+        key: staging-cache-orangepi-5-plus-${{ hashFiles('.config') }}
         restore-keys: |
-          ${{ runner.os }}-staging-${{ matrix.target }}-
-          ${{ runner.os }}-staging-
+          staging-cache-orangepi-5-plus-
 
-    - name: Configure environment
+    - name: Build in OpenWrt SDK Container
       run: |
-        echo 'export PATH="/usr/lib/ccache:$PATH"' >> $GITHUB_ENV
-        ccache --version
+        echo "=== Orange Pi 5 Plus Build Configuration ==="
+        echo "Target Device: Xunlong Orange Pi 5 Plus"
+        echo "Target Platform: Rockchip RK3588 Armv8"
+        echo "Build Environment: OpenWrt SDK Docker Container"
+        echo "Config File: orange-pi-5-plus.config"
 
-    - name: Update feeds
-      run: |
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
+        # Validate config file
+        if [ ! -f orange-pi-5-plus.config ]; then
+          echo "ERROR: orange-pi-5-plus.config file not found!"
+          exit 1
+        fi
 
-    - name: Configure build
-      run: |
-        echo "=== Build Configuration ==="
-        echo "Target: ${{ matrix.target }}"
-        echo "Runner: ${{ runner.os }}"
-        echo "CPU cores: $(nproc)"
-        echo "Available memory:"
-        free -h
+        echo "=== Config Validation ==="
+        grep -E "CONFIG_TARGET.*orangepi.*5.*plus" orange-pi-5-plus.config || {
+          echo "WARNING: Orange Pi 5 Plus config not found in config file"
+        }
 
-        # Backup existing config if present
-        [ -f .config ] && cp .config .config.backup && echo "Using existing .config" || echo "No existing .config found"
+        # Copy config to .config for build system
+        cp orange-pi-5-plus.config .config
 
-        # Generate default config if needed
-        [ -f .config ] || make defconfig
+        # Run build in Docker container
+        docker run --rm \
+          -v $(pwd):/home/build/openwrt \
+          -v ~/.ccache:/home/build/.ccache \
+          -w /home/build/openwrt \
+          openwrt/sdk:latest \
+          /bin/bash -c "
+            # Setup build environment
+            echo 'Setting up build environment...'
+            export FORCE_UNSAFE_CONFIGURE=1
+            export PATH=/usr/lib/ccache:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-        echo "=== Config Summary ==="
-        grep "CONFIG_TARGET" .config | head -5 || echo "Config not found"
+            # Configure git for reproducible builds
+            git config --global user.name 'OpenWrt CI'
+            git config --global user.email 'ci@openwrt.org'
 
-    - name: Download package sources
-      run: |
-        make download -j$(nproc) || make download -j1
+            # Update feeds
+            echo 'Updating feeds...'
+            ./scripts/feeds update -a
+            ./scripts/feeds install -a
 
-    - name: Build toolchain
-      run: |
-        make toolchain/install -j$(nproc) V=s
+            # Use the provided config
+            echo 'Using Orange Pi 5 Plus configuration...'
+            if [ -f .config ]; then
+              echo 'Loading .config file'
+              make defconfig
+            else
+              echo 'ERROR: .config file not found in container'
+              exit 1
+            fi
 
-    - name: Build target
-      run: |
-        make -j$(nproc) V=s || make -j1 V=s
+            # Show build info
+            echo '=== Build Information ==='
+            echo 'Target Device: Orange Pi 5 Plus'
+            echo 'Target Config: orange-pi-5-plus.config'
+            echo 'CPU Cores:' \$(nproc)
+            echo 'Available Memory:' \$(free -h | grep '^Mem:' | awk '{print \$2}')
+            echo 'Disk Space:' \$(df -h . | tail -1 | awk '{print \$4}')
+
+            # Download sources
+            echo 'Downloading package sources...'
+            make download -j\$(nproc) || make download -j1
+
+            # Build toolchain
+            echo 'Building toolchain...'
+            make toolchain/install -j\$(nproc) V=s
+
+            # Build target firmware
+            echo 'Building Orange Pi 5 Plus firmware...'
+            make -j\$(nproc) V=s || make -j1 V=s
+
+            # Show build results
+            echo '=== Build Completed ==='
+            echo 'Firmware files:'
+            find bin/targets -name '*orangepi*5*plus*' -o -name '*.bin' -o -name '*.img' | head -10
+          "
 
     - name: Show ccache stats
       run: |
-        ccache --show-stats
+        ccache --show-stats || echo "ccache stats not available"
 
-    - name: Create artifacts
+    - name: Prepare artifacts
       if: success()
       run: |
+        echo "=== Preparing Build Artifacts ==="
         mkdir -p artifacts
-        # Copy built images
-        find bin/targets -name "*.bin" -o -name "*.img" -o -name "*.tar.gz" -o -name "*.img.gz" | \
+
+        # Find Orange Pi 5 Plus specific files
+        echo "Looking for Orange Pi 5 Plus firmware files..."
+        find bin/targets -name "*orangepi*5*plus*" -o -name "*rk3588*" | \
           xargs -I {} cp {} artifacts/ 2>/dev/null || true
 
-        # Copy packages if any
-        find bin/packages -name "*.ipk" 2>/dev/null | head -50 | \
+        # Also copy any generic firmware files
+        find bin/targets -name "*.bin" -o -name "*.img" -o -name "*.tar.gz" | \
           xargs -I {} cp {} artifacts/ 2>/dev/null || true
 
-        # List artifacts
-        echo "=== Build Artifacts ==="
+        # Copy IPK packages if any
+        find bin/packages -name "*.ipk" 2>/dev/null | head -20 | \
+          xargs -I {} cp {} artifacts/ 2>/dev/null || true
+
+        echo "=== Artifacts Created ==="
         ls -lah artifacts/ || echo "No artifacts found"
 
-        # Show build info
-        echo "=== Build Info ==="
-        echo "Target: ${{ matrix.target }}"
-        echo "Config: $(basename .config 2>/dev/null || echo 'default')"
-        echo "Space used:"
-        df -h . || true
+        # Show disk usage
+        echo "=== Disk Usage ==="
+        df -h . | tail -1
+        du -sh bin/ staging_dir/ dl/ 2>/dev/null || true
 
-    - name: Upload build artifacts
+    - name: Upload Orange Pi 5 Plus firmware
       if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: openwrt-${{ matrix.target }}-${{ github.run_number }}
+        name: orangepi-5-plus-firmware-${{ github.run_number }}
         path: artifacts/
         retention-days: 7
 
@@ -171,9 +190,8 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: build-logs-${{ matrix.target }}-${{ github.run_number }}
+        name: orangepi-5-plus-build-logs-${{ github.run_number }}
         path: |
-          logs/
           .config
-          build_dir/*/linux-*/.config 2>/dev/null || true
+          logs/ 2>/dev/null || true
         retention-days: 7

@@ -1,0 +1,176 @@
+name: Build OpenWrt
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - '.config'
+      - 'package/**'
+      - 'target/**'
+      - 'config/**'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - '.config'
+      - 'package/**'
+      - 'target/**'
+      - 'config/**'
+
+env:
+  FORCE_UNSAFE_CONFIGURE: 1
+  DEBIAN_FRONTEND: noninteractive
+  CCACHE_DIR: /tmp/ccache
+  CCACHE_MAXSIZE: 2G
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [rockchip-armv8]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 512
+        swap-size-mb: 1024
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential clang flex bison g++ gawk \
+          gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev \
+          python3-distutils rsync unzip zlib1g-dev file wget qemu-utils \
+          libncursesw5-dev device-tree-compiler ccache
+
+    - name: Setup build environment
+      run: |
+        # Set git config for reproducible builds
+        git config --global user.email "ci@openwrt.org"
+        git config --global user.name "OpenWrt CI"
+
+        # Clean up any existing build artifacts that might cause issues
+        rm -rf tmp/ build_dir/target-*/.built* 2>/dev/null || true
+
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ${{ runner.os }}-ccache-${{ matrix.target }}-${{ hashFiles('.config') }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-${{ matrix.target }}-
+          ${{ runner.os }}-ccache-
+        max-size: 2G
+
+    - name: Cache dl files
+      uses: actions/cache@v4
+      with:
+        path: dl
+        key: ${{ runner.os }}-dl-${{ hashFiles('**/feeds.conf.default', '**/feeds.conf') }}
+        restore-keys: |
+          ${{ runner.os }}-dl-
+
+    - name: Cache staging_dir
+      uses: actions/cache@v4
+      with:
+        path: staging_dir
+        key: ${{ runner.os }}-staging-${{ matrix.target }}-${{ hashFiles('.config', '**/feeds.conf.default') }}
+        restore-keys: |
+          ${{ runner.os }}-staging-${{ matrix.target }}-
+          ${{ runner.os }}-staging-
+
+    - name: Configure environment
+      run: |
+        echo 'export PATH="/usr/lib/ccache:$PATH"' >> $GITHUB_ENV
+        ccache --version
+
+    - name: Update feeds
+      run: |
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+
+    - name: Configure build
+      run: |
+        echo "=== Build Configuration ==="
+        echo "Target: ${{ matrix.target }}"
+        echo "Runner: ${{ runner.os }}"
+        echo "CPU cores: $(nproc)"
+        echo "Available memory:"
+        free -h
+
+        # Backup existing config if present
+        [ -f .config ] && cp .config .config.backup && echo "Using existing .config" || echo "No existing .config found"
+
+        # Generate default config if needed
+        [ -f .config ] || make defconfig
+
+        echo "=== Config Summary ==="
+        grep "CONFIG_TARGET" .config | head -5 || echo "Config not found"
+
+    - name: Download package sources
+      run: |
+        make download -j$(nproc) || make download -j1
+
+    - name: Build toolchain
+      run: |
+        make toolchain/install -j$(nproc) V=s
+
+    - name: Build target
+      run: |
+        make -j$(nproc) V=s || make -j1 V=s
+
+    - name: Show ccache stats
+      run: |
+        ccache --show-stats
+
+    - name: Create artifacts
+      if: success()
+      run: |
+        mkdir -p artifacts
+        # Copy built images
+        find bin/targets -name "*.bin" -o -name "*.img" -o -name "*.tar.gz" -o -name "*.img.gz" | \
+          xargs -I {} cp {} artifacts/ 2>/dev/null || true
+
+        # Copy packages if any
+        find bin/packages -name "*.ipk" 2>/dev/null | head -50 | \
+          xargs -I {} cp {} artifacts/ 2>/dev/null || true
+
+        # List artifacts
+        echo "=== Build Artifacts ==="
+        ls -lah artifacts/ || echo "No artifacts found"
+
+        # Show build info
+        echo "=== Build Info ==="
+        echo "Target: ${{ matrix.target }}"
+        echo "Config: $(basename .config 2>/dev/null || echo 'default')"
+        echo "Space used:"
+        df -h . || true
+
+    - name: Upload build artifacts
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: openwrt-${{ matrix.target }}-${{ github.run_number }}
+        path: artifacts/
+        retention-days: 7
+
+    - name: Upload build logs on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs-${{ matrix.target }}-${{ github.run_number }}
+        path: |
+          logs/
+          .config
+          build_dir/*/linux-*/.config 2>/dev/null || true
+        retention-days: 7

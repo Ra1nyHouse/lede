@@ -5,14 +5,14 @@
  * Author: Cerf Yu <cerf.yu@rock-chips.com>
  */
 
-#include <rga.h>
-#include <rga_job.h>
-#include <rga_mm.h>
-#include <rga_dma_buf.h>
-#include <rga_common.h>
-#include <rga_iommu.h>
-#include <rga_hw_config.h>
-#include <rga_debugger.h>
+#include "rga.h"
+#include "rga_job.h"
+#include "rga_mm.h"
+#include "rga_dma_buf.h"
+#include "rga_common.h"
+#include "rga_iommu.h"
+#include "rga_hw_config.h"
+#include "rga_debugger.h"
 
 static void rga_current_mm_read_lock(struct mm_struct *mm)
 {

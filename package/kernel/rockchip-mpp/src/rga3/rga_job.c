@@ -5,13 +5,13 @@
  * Author: Huang Lee <Putin.li@rock-chips.com>
  */
 
-#include <rga_job.h>
-#include <rga_fence.h>
-#include <rga_dma_buf.h>
-#include <rga_mm.h>
-#include <rga_iommu.h>
-#include <rga_debugger.h>
-#include <rga_common.h>
+#include "rga_job.h"
+#include "rga_fence.h"
+#include "rga_dma_buf.h"
+#include "rga_mm.h"
+#include "rga_iommu.h"
+#include "rga_debugger.h"
+#include "rga_common.h"
 
 static void rga_job_free(struct rga_job *job)
 {

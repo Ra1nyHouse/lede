@@ -6,7 +6,7 @@
  *	Huang Lee <Putin.li@rock-chips.com>
  */
 
-#include <rga_hw_config.h>
+#include "rga_hw_config.h"
 
 /* RGA 1Word = 4Byte */
 #define WORD_TO_BYTE(w) ((w) * 4)

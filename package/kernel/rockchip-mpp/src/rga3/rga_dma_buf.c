@@ -5,11 +5,11 @@
  * Author: Huang Lee <Putin.li@rock-chips.com>
  */
 
-#include <rga_dma_buf.h>
-#include <rga.h>
-#include <rga_common.h>
-#include <rga_job.h>
-#include <rga_debugger.h>
+#include "rga_dma_buf.h"
+#include "rga.h"
+#include "rga_common.h"
+#include "rga_job.h"
+#include "rga_debugger.h"
 
 int rga_buf_size_cal(unsigned long yrgb_addr, unsigned long uv_addr,
 		      unsigned long v_addr, int format, uint32_t w,

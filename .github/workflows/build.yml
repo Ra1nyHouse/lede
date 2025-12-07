@@ -5,6 +5,7 @@ name: Build OpenWrt for Orange Pi 5 Plus
 # Triggered on pushes and pull requests to master branch
 # Uses orange-pi-5-plus.config from repo root for consistent builds
 # Includes full MPP/NPU/VPU support for multimedia acceleration
+# Now includes proper videobuf2 support for V4L2 drivers
 
 on:
   push:

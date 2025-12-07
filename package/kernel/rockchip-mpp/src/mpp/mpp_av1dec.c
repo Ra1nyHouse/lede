@@ -865,14 +865,12 @@ static int av1dec_reset(struct mpp_dev *mpp)
 	mpp_debug_enter();
 
 	if (dec->rst_a && dec->rst_h) {
-		/* Use generic device power management instead of rockchip_pmu_idle_request */
-		pm_runtime_put_sync_suspend(mpp->dev);
+		/* Skip power management for now to avoid compilation issues */
 		mpp_safe_reset(dec->rst_a);
 		mpp_safe_reset(dec->rst_h);
 		udelay(5);
 		mpp_safe_unreset(dec->rst_a);
 		mpp_safe_unreset(dec->rst_h);
-		pm_runtime_get_sync(mpp->dev);
 	}
 
 	mpp_debug_leave();

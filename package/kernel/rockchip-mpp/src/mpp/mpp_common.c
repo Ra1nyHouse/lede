@@ -28,6 +28,7 @@
 #include <linux/seq_file.h>
 #include <linux/slab.h>
 #include <linux/uaccess.h>
+#include <linux/file.h>
 #include <linux/nospec.h>
 
 #include <soc/rockchip/pm_domains.h>
@@ -1559,6 +1560,7 @@ next:
 			int ret = -EBADF;
 
 			mpp_err("fd %d get session failed\n", bat_msg.fd);
+			fdput(f);
 
 			if (copy_to_user(&usr_cmd->ret, &ret, sizeof(usr_cmd->ret)))
 				mpp_err("copy_to_user failed.\n");

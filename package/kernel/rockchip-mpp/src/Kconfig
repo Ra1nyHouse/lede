@@ -2,6 +2,7 @@
 
 menu "Rockchip media platform drivers"
 
+source "drivers/video/rockchip/mpp/Kconfig"
 source "drivers/video/rockchip/rga/Kconfig"
 source "drivers/media/platform/rockchip/fec/Kconfig"
 source "drivers/media/platform/rockchip/avsp/Kconfig"

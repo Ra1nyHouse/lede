@@ -3,6 +3,7 @@ name: Build OpenWrt for Orange Pi 5 Plus
 # This workflow builds OpenWrt firmware specifically for Xunlong Orange Pi 5 Plus
 # Using OpenWrt SDK Docker container with caching support
 # Triggered on pushes and pull requests to master branch
+# Uses orange-pi-5-plus.config for consistent builds
 
 on:
   push:

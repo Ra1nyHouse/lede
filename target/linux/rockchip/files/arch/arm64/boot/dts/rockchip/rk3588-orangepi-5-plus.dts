@@ -11,9 +11,6 @@
 #include <dt-bindings/pinctrl/rockchip.h>
 #include <dt-bindings/usb/pd.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
-#include <dt-bindings/clock/rockchip,rk3588-cru.h>
-#include <dt-bindings/power/rockchip,rk3588-power.h>
-#include <dt-bindings/reset/rockchip,rk3588-cru.h>
 #include "rk3588.dtsi"
 
 / {
@@ -36,11 +33,11 @@
 		compatible = "rockchip,rk3588-rga", "rockchip,rk3288-rga";
 		reg = <0x0 0xfdb80000 0x0 0x180>;
 		interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH 0>;
-		clocks = <&cru ACLK_RGA2>, <&cru HCLK_RGA2>, <&cru CLK_RGA2_CORE>;
+		clocks = <&cru 200>, <&cru 201>, <&cru 202>;
 		clock-names = "aclk", "hclk", "sclk";
-		resets = <&cru SRST_RGA2_CORE>, <&cru SRST_A_RGA2>, <&cru SRST_H_RGA2>;
+		resets = <&cru 100>, <&cru 101>, <&cru 102>;
 		reset-names = "core", "axi", "ahb";
-		power-domains = <&power RK3588_PD_VDPU>;
+		power-domains = <&power 10>;
 		status = "disabled";
 	};
 
@@ -49,11 +46,11 @@
 		compatible = "rockchip,rk3588-rga", "rockchip,rk3288-rga";
 		reg = <0x0 0xfdb90000 0x0 0x180>;
 		interrupts = <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH 0>;
-		clocks = <&cru ACLK_RGA3>, <&cru HCLK_RGA3>, <&cru CLK_RGA3_CORE>;
+		clocks = <&cru 203>, <&cru 204>, <&cru 205>;
 		clock-names = "aclk", "hclk", "sclk";
-		resets = <&cru SRST_RGA3_CORE>, <&cru SRST_A_RGA3>, <&cru SRST_H_RGA3>;
+		resets = <&cru 103>, <&cru 104>, <&cru 105>;
 		reset-names = "core", "axi", "ahb";
-		power-domains = <&power RK3588_PD_RGA>;
+		power-domains = <&power 11>;
 		status = "disabled";
 	};
 
@@ -62,9 +59,9 @@
 		compatible = "rockchip,iommu";
 		reg = <0x0 0xfdb90f00 0x0 0x40>;
 		interrupts = <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH 0>;
-		clocks = <&cru ACLK_RGA3>, <&cru HCLK_RGA3>;
+		clocks = <&cru 203>, <&cru 204>;
 		clock-names = "aclk", "iface";
-		power-domains = <&power RK3588_PD_RGA>;
+		power-domains = <&power 11>;
 		#iommu-cells = <0>;
 		status = "disabled";
 	};
@@ -74,11 +71,11 @@
 		compatible = "rockchip,rk3588-rga", "rockchip,rk3288-rga";
 		reg = <0x0 0xfdba0000 0x0 0x180>;
 		interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH 0>;
-		clocks = <&cru ACLK_RGA3>, <&cru HCLK_RGA3>, <&cru CLK_RGA3_CORE>;
+		clocks = <&cru 203>, <&cru 204>, <&cru 205>;
 		clock-names = "aclk", "hclk", "sclk";
-		resets = <&cru SRST_RGA3_CORE>, <&cru SRST_A_RGA3>, <&cru SRST_H_RGA3>;
+		resets = <&cru 103>, <&cru 104>, <&cru 105>;
 		reset-names = "core", "axi", "ahb";
-		power-domains = <&power RK3588_PD_RGA>;
+		power-domains = <&power 11>;
 		status = "disabled";
 	};
 
@@ -87,9 +84,9 @@
 		compatible = "rockchip,iommu";
 		reg = <0x0 0xfdba0f00 0x0 0x40>;
 		interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH 0>;
-		clocks = <&cru ACLK_RGA3>, <&cru HCLK_RGA3>;
+		clocks = <&cru 203>, <&cru 204>;
 		clock-names = "aclk", "iface";
-		power-domains = <&power RK3588_PD_RGA>;
+		power-domains = <&power 11>;
 		#iommu-cells = <0>;
 		status = "disabled";
 	};
@@ -99,11 +96,11 @@
 		compatible = "rockchip,rk3588-npu";
 		reg = <0x0 0xfdab0000 0x0 0x100000>;
 		interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH 0>;
-		clocks = <&cru ACLK_NPU>, <&cru HCLK_NPU>, <&cru CLK_NPU_CORE>;
+		clocks = <&cru 300>, <&cru 301>, <&cru 302>;
 		clock-names = "aclk", "hclk", "sclk";
-		resets = <&cru SRST_NPU_CORE>, <&cru SRST_A_NPU>, <&cru SRST_H_NPU>;
+		resets = <&cru 200>, <&cru 201>, <&cru 202>;
 		reset-names = "core", "axi", "ahb";
-		power-domains = <&power RK3588_PD_NPU>;
+		power-domains = <&power 12>;
 		status = "disabled";
 	};
 
@@ -112,9 +109,9 @@
 		compatible = "rockchip,iommu";
 		reg = <0x0 0xfdab0800 0x0 0x40>;
 		interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH 0>;
-		clocks = <&cru ACLK_NPU>, <&cru HCLK_NPU>;
+		clocks = <&cru 300>, <&cru 301>;
 		clock-names = "aclk", "iface";
-		power-domains = <&power RK3588_PD_NPU>;
+		power-domains = <&power 12>;
 		#iommu-cells = <0>;
 		status = "disabled";
 	};
@@ -124,11 +121,11 @@
 		compatible = "rockchip,rk3588-vpu";
 		reg = <0x0 0xfdb50000 0x0 0x1000>;
 		interrupts = <GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH 0>;
-		clocks = <&cru ACLK_VPU>, <&cru HCLK_VPU>, <&cru CLK_VPU_CORE>;
+		clocks = <&cru 400>, <&cru 401>, <&cru 402>;
 		clock-names = "aclk", "hclk", "sclk";
-		resets = <&cru SRST_VPU_CORE>, <&cru SRST_A_VPU>, <&cru SRST_H_VPU>;
+		resets = <&cru 300>, <&cru 301>, <&cru 302>;
 		reset-names = "core", "axi", "ahb";
-		power-domains = <&power RK3588_PD_VPU>;
+		power-domains = <&power 10>;
 		status = "disabled";
 	};
 
@@ -143,11 +140,11 @@
 		compatible = "rockchip,rk3588-av1-vpu";
 		reg = <0x0 0xfdc70000 0x0 0x800>;
 		interrupts = <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH 0>;
-		clocks = <&cru ACLK_AV1>, <&cru HCLK_AV1>, <&cru CLK_AV1_CORE>;
+		clocks = <&cru 500>, <&cru 501>, <&cru 502>;
 		clock-names = "aclk", "hclk", "sclk";
-		resets = <&cru SRST_AV1_CORE>, <&cru SRST_A_AV1>, <&cru SRST_H_AV1>;
+		resets = <&cru 400>, <&cru 401>, <&cru 402>;
 		reset-names = "core", "axi", "ahb";
-		power-domains = <&power RK3588_PD_AV1>;
+		power-domains = <&power 13>;
 		status = "disabled";
 	};
 

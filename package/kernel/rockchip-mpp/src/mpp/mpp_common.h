@@ -24,7 +24,7 @@
 #include <linux/poll.h>
 #include <linux/platform_device.h>
 #include <soc/rockchip/pm_domains.h>
-#include <uapi/linux/rk-mpp.h>
+#include "rk-mpp.h"
 
 #define MHZ				(1000 * 1000)
 #define MPP_WORK_TIMEOUT_DELAY		(500)

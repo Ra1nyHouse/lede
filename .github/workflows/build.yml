@@ -1,5 +1,8 @@
 name: Build OpenWrt
 
+# This workflow builds OpenWrt firmware for Rockchip targets with caching support
+# Triggered on pushes and pull requests to master branch
+
 on:
   push:
     branches: [ master ]

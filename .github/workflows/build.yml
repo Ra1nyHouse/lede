@@ -71,39 +71,49 @@ jobs:
         restore-keys: |
           staging-cache-orangepi-5-plus-
 
-    - name: Build in OpenWrt SDK Container
+    - name: Setup Build Configuration
       run: |
         echo "=== Orange Pi 5 Plus Build Configuration ==="
         echo "Target Device: Xunlong Orange Pi 5 Plus"
         echo "Target Platform: Rockchip RK3588 Armv8"
         echo "Build Environment: OpenWrt SDK Docker Container"
-        echo "Config File: orange-pi-5-plus.config"
 
-        # Validate config file
+        # Check for orange-pi-5-plus.config in project root
         if [ ! -f orange-pi-5-plus.config ]; then
-          echo "ERROR: orange-pi-5-plus.config file not found!"
-          echo "This file should be present in the repository."
-          echo "Please ensure the file is committed and pushed to the repository."
+          echo "ERROR: orange-pi-5-plus.config not found in project root!"
           echo ""
-          echo "To recreate it from current .config:"
+          echo "This file is required for Orange Pi 5 Plus builds."
+          echo "Please ensure the file exists in the repository root."
+          echo ""
+          echo "To create it from your current .config:"
           echo "  cp .config orange-pi-5-plus.config"
           echo "  git add orange-pi-5-plus.config"
           echo "  git commit -m 'Add Orange Pi 5 Plus config'"
           echo "  git push"
+          echo ""
+          echo "Available files in current directory:"
+          ls -la | head -10
           exit 1
         fi
 
+        echo "✓ Found orange-pi-5-plus.config in project root"
+
+        # Validate the config file contains Orange Pi 5 Plus settings
         echo "=== Config Validation ==="
         if grep -q "CONFIG_TARGET.*orangepi.*5.*plus" orange-pi-5-plus.config; then
-          echo "✓ Orange Pi 5 Plus configuration found"
+          echo "✓ Orange Pi 5 Plus configuration validated"
         else
-          echo "WARNING: Orange Pi 5 Plus config not found in config file"
-          echo "The config file may not be for Orange Pi 5 Plus"
+          echo "ERROR: Config file does not contain Orange Pi 5 Plus settings!"
+          echo "Please verify the config file is correct for Orange Pi 5 Plus."
+          exit 1
         fi
 
-        # Copy config to .config for build system
+        # Copy to .config for build system
         cp orange-pi-5-plus.config .config
+        echo "✓ Config file copied to .config for build system"
 
+    - name: Build in OpenWrt SDK Container
+      run: |
         # Run build in Docker container
         docker run --rm \
           -v $(pwd):/home/build/openwrt \
@@ -120,25 +130,28 @@ jobs:
             git config --global user.name 'OpenWrt CI'
             git config --global user.email 'ci@openwrt.org'
 
+            # Verify .config exists (should have been copied from orange-pi-5-plus.config)
+            if [ ! -f .config ]; then
+              echo 'ERROR: .config file not found!'
+              echo 'This indicates the config setup step failed.'
+              exit 1
+            fi
+
+            echo '✓ .config file verified'
+
             # Update feeds
             echo 'Updating feeds...'
             ./scripts/feeds update -a
             ./scripts/feeds install -a
 
-            # Use the provided config
-            echo 'Using Orange Pi 5 Plus configuration...'
-            if [ -f .config ]; then
-              echo 'Loading .config file'
-              make defconfig
-            else
-              echo 'ERROR: .config file not found in container'
-              exit 1
-            fi
+            # Load and validate configuration
+            echo 'Loading configuration...'
+            make defconfig
 
             # Show build info
             echo '=== Build Information ==='
             echo 'Target Device: Orange Pi 5 Plus'
-            echo 'Target Config: orange-pi-5-plus.config'
+            echo 'Configuration: Based on orange-pi-5-plus.config'
             echo 'CPU Cores:' \$(nproc)
             echo 'Available Memory:' \$(free -h | grep '^Mem:' | awk '{print \$2}')
             echo 'Disk Space:' \$(df -h . | tail -1 | awk '{print \$4}')

@@ -119,6 +119,30 @@ make toolchain/install V=s -j10
 make tools/findutils/{clean,compile} V=s
 make package/firmware/panthor-firmware/{clean,compile} V=s
 make package/kernel/{rknpu,panthor,rockchip-mpp}/{clean,compile} V=s
+
+## 编译错误排查
+
+### 错误：需要创建 /rockchip-mpp 目录
+
+如果遇到类似错误，请检查：
+1. 确保在项目根目录（lede/）下运行 make 命令
+2. 确认编译环境正确设置：
+   ```bash
+   # 检查当前目录
+   pwd  # 应该显示 /path/to/lede
+
+   # 如果在容器中编译，确保映射了正确的目录
+   # 容器运行命令示例：
+   docker run -it --rm \
+     -v $(pwd):/builder \
+     openwrt/sdk:latest \
+     /bin/bash
+   ```
+3. 清理并重新编译：
+   ```bash
+   make package/kernel/rockchip-mpp/clean
+   make package/kernel/rockchip-mpp/compile V=s
+   ```
 make V=s -j10
 
 

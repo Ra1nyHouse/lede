@@ -8,17 +8,7 @@ PKG_BUILD_DIR:=$(KERNEL_BUILD_DIR)/$(PKG_NAME)
 include $(INCLUDE_DIR)/kernel.mk
 include $(INCLUDE_DIR)/package.mk
 
-define KernelPackage/rockchip-mpp
-  SUBMENU:=Rockchip
-  TITLE:=Rockchip MPP service framework
-  DEPENDS:=@TARGET_rockchip
-  FILES:=$(PKG_BUILD_DIR)/mpp/rk_vcodec.ko
-  AUTOLOAD:=$(call AutoLoad,89,rk_vcodec)
-endef
-
-define KernelPackage/rockchip-mpp/Description
- Rockchip Media Process Platform service framework.
-endef
+# MPP framework not available in current kernel version
 
 define KernelPackage/rockchip-rga
   SUBMENU:=Rockchip
@@ -63,28 +53,12 @@ endef
 
 define Build/Compile
 	$(KERNEL_MAKE) M=$(PKG_BUILD_DIR) \
-		CONFIG_ROCKCHIP_MPP_SERVICE=m \
-		CONFIG_ROCKCHIP_MPP_PROC_FS=y \
-		CONFIG_ROCKCHIP_MPP_RKVDEC=m \
-		CONFIG_ROCKCHIP_MPP_RKVDEC2=m \
-		CONFIG_ROCKCHIP_MPP_RKVENC=m \
-		CONFIG_ROCKCHIP_MPP_RKVENC2=m \
-		CONFIG_ROCKCHIP_MPP_VDPU1=m \
-		CONFIG_ROCKCHIP_MPP_VEPU1=m \
-		CONFIG_ROCKCHIP_MPP_VDPU2=m \
-		CONFIG_ROCKCHIP_MPP_VEPU2=m \
-		CONFIG_ROCKCHIP_MPP_IEP2=m \
-		CONFIG_ROCKCHIP_MPP_JPGDEC=m \
-		CONFIG_ROCKCHIP_MPP_JPGENC=m \
-		CONFIG_ROCKCHIP_MPP_AV1DEC=m \
-		CONFIG_ROCKCHIP_MPP_VDPP=m \
-		CONFIG_ROCKCHIP_RGA=m \
+		CONFIG_VIDEO_ROCKCHIP_RGA=m \
 		CONFIG_VIDEO_ROCKCHIP_FEC=m \
 		CONFIG_VIDEO_ROCKCHIP_AVSP=m \
 		modules
 endef
 
-$(eval $(call KernelPackage,rockchip-mpp))
 $(eval $(call KernelPackage,rockchip-rga))
 $(eval $(call KernelPackage,rockchip-fec))
 $(eval $(call KernelPackage,rockchip-avsp))

@@ -1,0 +1,131 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * RK3588 MPP/NPU/VPU device tree nodes
+ */
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/clock/rockchip,rk3588-cru.h>
+#include <dt-bindings/power/rockchip,rk3588-power.h>
+#include <dt-bindings/reset/rockchip,rk3588-cru.h>
+
+/ {
+	/* RGA2 - Raster Graphics Accelerator 2 */
+	rga2: rga@fdb80000 {
+		compatible = "rockchip,rk3588-rga", "rockchip,rk3288-rga";
+		reg = <0x0 0xfdb80000 0x0 0x180>;
+		interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH 0>;
+		clocks = <&cru ACLK_RGA2>, <&cru HCLK_RGA2>, <&cru CLK_RGA2_CORE>;
+		clock-names = "aclk", "hclk", "sclk";
+		resets = <&cru SRST_RGA2_CORE>, <&cru SRST_A_RGA2>, <&cru SRST_H_RGA2>;
+		reset-names = "core", "axi", "ahb";
+		power-domains = <&power RK3588_PD_VDPU>;
+		status = "disabled";
+	};
+
+	/* RGA3 Core 0 */
+	rga3_core0: rga@fdb90000 {
+		compatible = "rockchip,rk3588-rga", "rockchip,rk3288-rga";
+		reg = <0x0 0xfdb90000 0x0 0x180>;
+		interrupts = <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH 0>;
+		clocks = <&cru ACLK_RGA3>, <&cru HCLK_RGA3>, <&cru CLK_RGA3_CORE>;
+		clock-names = "aclk", "hclk", "sclk";
+		resets = <&cru SRST_RGA3_CORE>, <&cru SRST_A_RGA3>, <&cru SRST_H_RGA3>;
+		reset-names = "core", "axi", "ahb";
+		power-domains = <&power RK3588_PD_RGA>;
+		status = "disabled";
+	};
+
+	/* RGA3 Core 0 MMU */
+	rga3_0_mmu: iommu@fdb90f00 {
+		compatible = "rockchip,iommu";
+		reg = <0x0 0xfdb90f00 0x0 0x40>;
+		interrupts = <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH 0>;
+		clocks = <&cru ACLK_RGA3>, <&cru HCLK_RGA3>;
+		clock-names = "aclk", "iface";
+		power-domains = <&power RK3588_PD_RGA>;
+		#iommu-cells = <0>;
+		status = "disabled";
+	};
+
+	/* RGA3 Core 1 */
+	rga3_core1: rga@fdba0000 {
+		compatible = "rockchip,rk3588-rga", "rockchip,rk3288-rga";
+		reg = <0x0 0xfdba0000 0x0 0x180>;
+		interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH 0>;
+		clocks = <&cru ACLK_RGA3>, <&cru HCLK_RGA3>, <&cru CLK_RGA3_CORE>;
+		clock-names = "aclk", "hclk", "sclk";
+		resets = <&cru SRST_RGA3_CORE>, <&cru SRST_A_RGA3>, <&cru SRST_H_RGA3>;
+		reset-names = "core", "axi", "ahb";
+		power-domains = <&power RK3588_PD_RGA>;
+		status = "disabled";
+	};
+
+	/* RGA3 Core 1 MMU */
+	rga3_1_mmu: iommu@fdba0f00 {
+		compatible = "rockchip,iommu";
+		reg = <0x0 0xfdba0f00 0x0 0x40>;
+		interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH 0>;
+		clocks = <&cru ACLK_RGA3>, <&cru HCLK_RGA3>;
+		clock-names = "aclk", "iface";
+		power-domains = <&power RK3588_PD_RGA>;
+		#iommu-cells = <0>;
+		status = "disabled";
+	};
+
+	/* RKNPU - Rockchip Neural Processing Unit */
+	rknpu: npu@fdab0000 {
+		compatible = "rockchip,rk3588-npu";
+		reg = <0x0 0xfdab0000 0x0 0x100000>;
+		interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH 0>;
+		clocks = <&cru ACLK_NPU>, <&cru HCLK_NPU>, <&cru CLK_NPU_CORE>;
+		clock-names = "aclk", "hclk", "sclk";
+		resets = <&cru SRST_NPU_CORE>, <&cru SRST_A_NPU>, <&cru SRST_H_NPU>;
+		reset-names = "core", "axi", "ahb";
+		power-domains = <&power RK3588_PD_NPU>;
+		status = "disabled";
+	};
+
+	/* RKNPU MMU */
+	rknpu_mmu: iommu@fdab0800 {
+		compatible = "rockchip,iommu";
+		reg = <0x0 0xfdab0800 0x0 0x40>;
+		interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH 0>;
+		clocks = <&cru ACLK_NPU>, <&cru HCLK_NPU>;
+		clock-names = "aclk", "iface";
+		power-domains = <&power RK3588_PD_NPU>;
+		#iommu-cells = <0>;
+		status = "disabled";
+	};
+
+	/* VPU - Video Processing Unit */
+	vpu: video-codec@fdb50000 {
+		compatible = "rockchip,rk3588-vpu";
+		reg = <0x0 0xfdb50000 0x0 0x1000>;
+		interrupts = <GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH 0>;
+		clocks = <&cru ACLK_VPU>, <&cru HCLK_VPU>, <&cru CLK_VPU_CORE>;
+		clock-names = "aclk", "hclk", "sclk";
+		resets = <&cru SRST_VPU_CORE>, <&cru SRST_A_VPU>, <&cru SRST_H_VPU>;
+		reset-names = "core", "axi", "ahb";
+		power-domains = <&power RK3588_PD_VPU>;
+		status = "disabled";
+	};
+
+	/* MPP Service Framework */
+	mpp_service: mpp-service {
+		compatible = "rockchip,mpp-service";
+		status = "disabled";
+	};
+
+	/* AV1 Decoder */
+	av1d: video-codec@fdc70000 {
+		compatible = "rockchip,rk3588-av1-vpu";
+		reg = <0x0 0xfdc70000 0x0 0x800>;
+		interrupts = <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH 0>;
+		clocks = <&cru ACLK_AV1>, <&cru HCLK_AV1>, <&cru CLK_AV1_CORE>;
+		clock-names = "aclk", "hclk", "sclk";
+		resets = <&cru SRST_AV1_CORE>, <&cru SRST_A_AV1>, <&cru SRST_H_AV1>;
+		reset-names = "core", "axi", "ahb";
+		power-domains = <&power RK3588_PD_AV1>;
+		status = "disabled";
+	};
+};

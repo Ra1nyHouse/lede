@@ -59,7 +59,7 @@ MPP 框架现在包含完整的编解码器支持，包括视频编解码器、�
    - `kmod-panthor`：Arm Mali Panthor GPU DRM 驱动（RK3588 Mali-G610/G615）。
 
    注意：可以通过 `make menuconfig` 进入 `Kernel modules -> Rockchip -> kmod-rockchip-mpp` 单独配置各个编解码器。
-3) 保存退出，按需选择对应 rootfs/镜像目标后编译：
+5) 保存退出，按需选择对应 rootfs/镜像目标后编译：
    ```bash
    make V=s
    # 或仅编译单个包

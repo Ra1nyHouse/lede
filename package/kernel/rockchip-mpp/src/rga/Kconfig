@@ -1,10 +1,10 @@
-config ROCKCHIP_RGA
-	tristate "Rockchip Raster 2d Graphic Acceleration Unit"
-	depends on ARCH_ROCKCHIP || COMPILE_TEST
-	help
-	  This is a driver for Rockchip SOC RGA 2d graphics accelerator.
-	  Rockchip RGA is a separate 2D raster graphic acceleration unit.
-	  It accelerates 2D graphics operations, such as point/line drawing,
-	  image scaling, rotation, BitBLT, alpha blending and image blur/sharpness.
+# SPDX-License-Identifier: GPL-2.0
+menu "RGA"
+	depends on ARCH_ROCKCHIP
 
-	  To compile this driver as a module choose m here.
+config ROCKCHIP_RGA
+	tristate "ROCKCHIP_RGA"
+	help
+	  rk30 rga module.
+
+endmenu

@@ -32,6 +32,30 @@ define KernelPackage/rockchip-rga/Description
  Driver for Rockchip RGA 2D graphics accelerator.
 endef
 
+define KernelPackage/rockchip-rga2
+  SUBMENU:=Rockchip
+  TITLE:=Rockchip RGA2 2D accelerator
+  DEPENDS:=@TARGET_rockchip_armv8 +kmod-drm-rockchip
+  FILES:=$(PKG_BUILD_DIR)/rga2/rga2.ko
+  AUTOLOAD:=$(call AutoLoad,90,rga2)
+endef
+
+define KernelPackage/rockchip-rga2/Description
+ Driver for Rockchip RGA2 2D graphics accelerator (RK356x/RK3588).
+endef
+
+define KernelPackage/rockchip-rga3
+  SUBMENU:=Rockchip
+  TITLE:=Rockchip RGA3 2D accelerator
+  DEPENDS:=@TARGET_rockchip_armv8 +kmod-drm-rockchip
+  FILES:=$(PKG_BUILD_DIR)/rga3/rga3.ko
+  AUTOLOAD:=$(call AutoLoad,90,rga3)
+endef
+
+define KernelPackage/rockchip-rga3/Description
+ Driver for Rockchip RGA3 2D graphics accelerator (RK3588).
+endef
+
 define KernelPackage/rockchip-fec
   SUBMENU:=Rockchip
   TITLE:=Rockchip FEC (fisheye correction)
@@ -79,6 +103,8 @@ define Build/Compile
 		CONFIG_ROCKCHIP_MPP_AV1DEC=m \
 		CONFIG_ROCKCHIP_MPP_VDPP=m \
 		CONFIG_ROCKCHIP_RGA=m \
+		CONFIG_ROCKCHIP_RGA2=m \
+		CONFIG_ROCKCHIP_MULTI_RGA=m \
 		CONFIG_VIDEO_ROCKCHIP_FEC=m \
 		CONFIG_VIDEO_ROCKCHIP_AVSP=m \
 		modules
@@ -86,6 +112,8 @@ endef
 
 $(eval $(call KernelPackage,rockchip-mpp))
 $(eval $(call KernelPackage,rockchip-rga))
+$(eval $(call KernelPackage,rockchip-rga2))
+$(eval $(call KernelPackage,rockchip-rga3))
 $(eval $(call KernelPackage,rockchip-fec))
 $(eval $(call KernelPackage,rockchip-avsp))
 

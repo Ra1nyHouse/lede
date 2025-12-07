@@ -683,6 +683,21 @@ endef
 
 $(eval $(call KernelPackage,drm-panfrost))
 
+define KernelPackage/drm-panthor
+  SUBMENU:=$(VIDEO_MENU)
+  TITLE:=DRM support for ARM Mali Valhall GPUs (panthor)
+  DEPENDS:=@(TARGET_rockchip||TARGET_sunxi) +kmod-drm-sched +kmod-drm-shmem-helper
+  KCONFIG:=CONFIG_DRM_PANTHOR
+  FILES:=$(LINUX_DIR)/drivers/gpu/drm/panthor/panthor.ko
+  AUTOLOAD:=$(call AutoProbe,panthor)
+endef
+
+define KernelPackage/drm-panthor/description
+  DRM driver for ARM Mali Valhall generation GPUs (e.g. G610/G615).
+endef
+
+$(eval $(call KernelPackage,drm-panthor))
+
 define KernelPackage/drm-panel-mipi-dbi
   SUBMENU:=$(VIDEO_MENU)
   TITLE:=Generic MIPI DBI LCD panel

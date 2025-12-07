@@ -17,3 +17,12 @@ define Package/eip197-mini-firmware/install
 		$(1)/lib/firmware/inside-secure/eip197_minifw
 endef
 $(eval $(call BuildPackage,eip197-mini-firmware))
+
+Package/mali-panthor-firmware = $(call Package/firmware-default,ARM Mali Valhall (panthor) firmware)
+define Package/mali-panthor-firmware/install
+	$(INSTALL_DIR) $(1)/lib/firmware/arm/mali/arch10.8
+	$(INSTALL_DATA) \
+		$(PKG_BUILD_DIR)/arm/mali/arch10.8/mali_csffw.bin \
+		$(1)/lib/firmware/arm/mali/arch10.8
+endef
+$(eval $(call BuildPackage,mali-panthor-firmware))

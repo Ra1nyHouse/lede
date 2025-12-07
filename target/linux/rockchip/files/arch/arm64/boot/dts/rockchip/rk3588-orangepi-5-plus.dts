@@ -273,6 +273,52 @@
 	status = "okay";
 };
 
+&rga2 {
+	status = "okay";
+};
+
+&rga3_core0 {
+	status = "okay";
+};
+
+&rga3_0_mmu {
+	status = "okay";
+};
+
+&rga3_core1 {
+	status = "okay";
+};
+
+&rga3_1_mmu {
+	status = "okay";
+};
+
+&rknpu {
+	rknpu-supply = <&vdd_gpu_s0>;
+	mem-supply = <&vdd_log_s0>;
+	status = "okay";
+};
+
+&rknpu_mmu {
+	status = "okay";
+};
+
+/* VPU (Video Processing Unit) */
+&vpu {
+	vpu-supply = <&vdd_vdenc_s0>;
+	status = "okay";
+};
+
+/* MPP Service Framework */
+&mpp_service {
+	status = "okay";
+};
+
+/* AV1 Decoder */
+&av1d {
+	status = "okay";
+};
+
 &i2c0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c0m2_xfer>;

@@ -30,3 +30,6 @@ git-src
 .cproject
 .ccache
 .vscode*
+.bash_history
+cpu_spin.sh
+TESTFILE

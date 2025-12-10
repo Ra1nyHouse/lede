@@ -20,12 +20,10 @@
 #include <linux/notifier.h>
 #include <linux/proc_fs.h>
 #include <linux/nospec.h>
-#include <linux/rockchip/rockchip_sip.h>
 #include <linux/regulator/consumer.h>
 
-#include <soc/rockchip/pm_domains.h>
-#include <soc/rockchip/rockchip_opp_select.h>
-#include <soc/rockchip/rockchip_sip.h>
+#include "rockchip_opp_select.h"
+#include "rockchip_sip.h"
 
 #include "mpp_debug.h"
 #include "mpp_common.h"

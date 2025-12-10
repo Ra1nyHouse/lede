@@ -1,8 +1,3 @@
-#ifndef CONFIG_ROCKCHIP_PM_DOMAINS
-static inline bool rockchip_pmu_pd_is_on(struct device *dev) { return true; }
-static inline void rockchip_pmu_pd_on(struct device *dev) {}
-static inline void rockchip_pmu_pd_off(struct device *dev) {}
-#endif
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd
@@ -32,14 +27,18 @@ static inline void rockchip_pmu_pd_off(struct device *dev) {}
 #include <linux/proc_fs.h>
 #include <linux/regulator/consumer.h>
 
-#include <soc/rockchip/pm_domains.h>
-
 #include "rockchip_opp_select.h"
 #include "rockchip_sip.h"
 #include "mpp_debug.h"
 #include "mpp_common.h"
 #include "mpp_iommu.h"
 #include "rockchip_iommu.h"
+
+/* Fallback stubs for kernels without Rockchip PMU domain helpers */
+struct device;
+static inline bool rockchip_pmu_pd_is_on(struct device *dev) { return true; }
+static inline void rockchip_pmu_pd_on(struct device *dev) {}
+static inline void rockchip_pmu_pd_off(struct device *dev) {}
 
 #include "hack/mpp_hack_px30.h"
 

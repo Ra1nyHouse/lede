@@ -216,6 +216,7 @@ static void task_msgs_reset(struct mpp_task_msgs *msgs)
 	msgs->req_cnt = 0;
 	msgs->set_cnt = 0;
 	msgs->poll_cnt = 0;
+	msgs->file = NULL;
 }
 
 static void task_msgs_init(struct mpp_task_msgs *msgs, struct mpp_session *session)
@@ -274,7 +275,9 @@ static void put_task_msgs(struct mpp_task_msgs *msgs)
 	}
 
 	if (msgs->ext_fd >= 0) {
-		fdput(msgs->f);
+		if (msgs->file)
+			fput(msgs->file);
+		msgs->file = NULL;
 		msgs->ext_fd = -1;
 	}
 
@@ -1543,7 +1546,7 @@ next:
 	if (msg_v1.cmd == MPP_CMD_SET_SESSION_FD) {
 		struct mpp_bat_msg bat_msg;
 		struct mpp_bat_msg __user *usr_cmd;
-		struct fd f;
+		struct file *file;
 
 		/* try session switch here */
 		usr_cmd = (struct mpp_bat_msg __user *)(unsigned long)msg_v1.data_ptr;
@@ -1555,12 +1558,11 @@ next:
 		if (bat_msg.flag & MPP_BAT_MSG_DONE)
 			goto session_switch_done;
 
-		f = fdget(bat_msg.fd);
-		if (!f.file) {
+		file = fget(bat_msg.fd);
+		if (!file) {
 			int ret = -EBADF;
 
 			mpp_err("fd %d get session failed\n", bat_msg.fd);
-			fdput(f);
 
 			if (copy_to_user(&usr_cmd->ret, &ret, sizeof(usr_cmd->ret)))
 				mpp_err("copy_to_user failed.\n");
@@ -1578,13 +1580,13 @@ next:
 		}
 
 		/* switch session */
-		session = f.file->private_data;
+		session = file->private_data;
 		msgs = get_task_msgs(session);
 
-		if (f.file->private_data == session)
+		if (file->private_data == session)
 			msgs->ext_fd = bat_msg.fd;
 
-		msgs->f = f;
+		msgs->file = file;
 
 		mpp_debug(DEBUG_IOCTL, "fd %d, session %d msg_cnt %d\n",
 				bat_msg.fd, session->index, session->msgs_cnt);

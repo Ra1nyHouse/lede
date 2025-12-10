@@ -23,6 +23,7 @@
 #include <linux/irqreturn.h>
 #include <linux/poll.h>
 #include <linux/platform_device.h>
+#include <linux/fs.h>
 #include <soc/rockchip/pm_domains.h>
 #include "rk-mpp.h"
 
@@ -165,7 +166,7 @@ struct mpp_task_msgs {
 
 	/* for fd reference */
 	int ext_fd;
-	struct fd f;
+	struct file *file;
 
 	u32 flags;
 	u32 req_cnt;

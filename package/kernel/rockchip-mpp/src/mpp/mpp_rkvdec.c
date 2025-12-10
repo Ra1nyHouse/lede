@@ -1,3 +1,8 @@
+#ifndef CONFIG_ROCKCHIP_PM_DOMAINS
+static inline bool rockchip_pmu_pd_is_on(struct device *dev) { return true; }
+static inline void rockchip_pmu_pd_on(struct device *dev) {}
+static inline void rockchip_pmu_pd_off(struct device *dev) {}
+#endif
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright (c) 2019 Fuzhou Rockchip Electronics Co., Ltd
@@ -1902,7 +1907,7 @@ static int rkvdec_probe(struct platform_device *pdev)
 	return 0;
 }
 
-static int rkvdec_remove(struct platform_device *pdev)
+static void rkvdec_remove(struct platform_device *pdev)
 {
 	struct device *dev = &pdev->dev;
 	struct mpp_dev *mpp = platform_get_drvdata(pdev);
@@ -1910,8 +1915,6 @@ static int rkvdec_remove(struct platform_device *pdev)
 	dev_info(dev, "remove device\n");
 	mpp_dev_remove(mpp);
 	rkvdec_procfs_remove(mpp);
-
-	return 0;
 }
 
 struct platform_driver rockchip_rkvdec_driver = {

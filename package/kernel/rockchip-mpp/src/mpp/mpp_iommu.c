@@ -21,7 +21,7 @@
 #ifdef CONFIG_ARM_DMA_USE_IOMMU
 #include <asm/dma-iommu.h>
 #endif
-#include <soc/rockchip/rockchip_iommu.h>
+#include "rockchip_iommu.h"
 
 #include "mpp_debug.h"
 #include "mpp_iommu.h"

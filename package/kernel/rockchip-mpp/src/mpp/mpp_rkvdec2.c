@@ -18,7 +18,7 @@
 #include "hack/mpp_rkvdec2_hack_rk3568.c"
 #include "hack/mpp_hack_rk3576.h"
 
-#include <soc/rockchip/rockchip_dmc.h>
+#include "rockchip_dmc.h"
 #include <soc/rockchip/rockchip_opp_select.h>
 #include <soc/rockchip/rockchip_system_monitor.h>
 #include <soc/rockchip/rockchip_iommu.h>

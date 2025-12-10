@@ -9,7 +9,6 @@
  *
  */
 #include <linux/delay.h>
-#include <linux/dma-buf-cache.h>
 #include <linux/dma-mapping.h>
 #include <linux/iommu.h>
 #include <linux/of.h>
